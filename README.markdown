@@ -63,9 +63,10 @@ Returns the value of a cvar.
 
 [Back to TOC](#gamesense-api-for-lua)
 
-### Other
 
-1. **`is_enemy(userid)`**
+client.is_enemy
+---------------
+**syntax:** is_enemy(userid)
 
 Returns true if the specified `userid` is on the enemy team.
 
@@ -73,7 +74,9 @@ Returns true if the specified `userid` is on the enemy team.
 
 [Back to TOC](#gamesense-api-for-lua)
 
-2. **`is_local_player(userid)`**
+client.is_local_player
+---------------
+**syntax:** is_local_player(userid)
 
 Returns true if the specified `userid` is you.
 
@@ -81,7 +84,9 @@ Returns true if the specified `userid` is you.
 
 [Back to TOC](#gamesense-api-for-lua)
 
-3. **`get_player_name(userid)`**
+client.get_player_name
+---------------
+**syntax:** get_player_name(userid)
 
 Returns the players name from `userid`, or nil if the user does not exist.
 
@@ -89,7 +94,9 @@ Returns the players name from `userid`, or nil if the user does not exist.
 
 [Back to TOC](#gamesense-api-for-lua)
 
-4. **`read_entity_prop(entindex, netvar)`**
+client.read_entity_prop
+---------------
+**syntax:** read_entity_prop(entindex, netvar)
 
 Returns value of the netvar on the entity
 
@@ -105,7 +112,9 @@ Returns value of the netvar on the entity
 
 [Back to TOC](#gamesense-api-for-lua)
 
-5. **`userid_to_entindex(userid)`**
+client.userid_to_entindex
+---------------
+**syntax:** userid_to_entindex(userid)
 
 Returns an `entindex` from a `userid`.
 
