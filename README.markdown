@@ -23,8 +23,9 @@ Output text to the console.
 
 [Back to TOC](#gamesense-api-for-lua)
 
-
-2. **`exec(cmds, ...)`**
+client.exec
+-----------
+**syntax:** exec(cmds, ...)
 
 Execute console command(s).
 
@@ -34,11 +35,18 @@ Execute console command(s).
 
 * **Example:**
 
-`client.exec("say Hello!")`
+```lua
+
+  client.exec("say Hello!")
+```
 
 >avaster: Hello!
 
-3. **`cvar_get(cvar)`**
+[Back to TOC](#gamesense-api-for-lua)
+
+client.cvar_get
+---------------
+**syntax:** cvar_get(convar_name)
 
 Returns the value of a cvar.
 
@@ -46,10 +54,14 @@ Returns the value of a cvar.
 
 * **Example:**
 
-`client.log('My name: ', client.cvar_get('name'))`
+```lua
+
+  client.log('My name: ', client.cvar_get('name'))`
+```
 
 >[gamesense] My name: avaster
 
+[Back to TOC](#gamesense-api-for-lua)
 
 ### Other
 
@@ -59,17 +71,23 @@ Returns true if the specified `userid` is on the enemy team.
 
 `userid` - The `userid` of the player.
 
+[Back to TOC](#gamesense-api-for-lua)
+
 2. **`is_local_player(userid)`**
 
 Returns true if the specified `userid` is you.
 
 `userid` - The `userid` of the player.
 
+[Back to TOC](#gamesense-api-for-lua)
+
 3. **`get_player_name(userid)`**
 
 Returns the players name from `userid`, or nil if the user does not exist.
 
 `userid` - The `userid` of the player.
+
+[Back to TOC](#gamesense-api-for-lua)
 
 4. **`read_entity_prop(entindex, netvar)`**
 
@@ -85,8 +103,12 @@ Returns value of the netvar on the entity
 
 >[gamesense] Health: 100 
 
+[Back to TOC](#gamesense-api-for-lua)
+
 5. **`userid_to_entindex(userid)`**
 
 Returns an `entindex` from a `userid`.
 
 `userid` - The `userid` of the player.
+
+[Back to TOC](#gamesense-api-for-lua)
