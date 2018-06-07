@@ -4,6 +4,11 @@ GameSense API for Lua
 * [client.log](#clientlog)
 * [client.exec](#clientexec)
 * [client.cvar_get](#clientcvar_get)
+* [client.is_enemy](#clientis_enemy)
+* [client.is_local_player](#clientis_local_player)
+* [client.get_player_name](#clientget_player_name)
+* [client.read_entity_prop](#clientread_entity_prop)
+* [client.userid_to_entindex](#clientuserid_to_entindex)
 
 client.log
 ----------
