@@ -9,6 +9,10 @@ GameSense API for Lua
 * [client.get_player_name](#clientget_player_name)
 * [client.read_entity_prop](#clientread_entity_prop)
 * [client.userid_to_entindex](#clientuserid_to_entindex)
+* [client.draw_debug_text](#clientdraw_debug_text)
+* [client.draw_hitboxes](#clientdraw_hitboxes)
+* [client.RandomInt](#clientRandomInt)
+* [client.RandomFloat](#clientRandomFloat)
 
 client.log
 ----------
@@ -80,7 +84,7 @@ Returns true if the specified `userid` is on the enemy team.
 [Back to TOC](#gamesense-api-for-lua)
 
 client.is_local_player
----------------
+----------------------
 **syntax:** *val = is_local_player(userid)*
 
 Returns true if the specified `userid` is you.
@@ -90,20 +94,20 @@ Returns true if the specified `userid` is you.
 [Back to TOC](#gamesense-api-for-lua)
 
 client.get_player_name
----------------
+----------------------
 **syntax:** *name = get_player_name(userid)*
 
-Returns the players name from `userid`, or nil if the user does not exist.
+Returns the players name from `userid`, or `nil` if the user does not exist.
 
 `userid` - The `userid` of the player.
 
 [Back to TOC](#gamesense-api-for-lua)
 
 client.read_entity_prop
----------------
+-----------------------
 **syntax:** *val = read_entity_prop(entindex, netvar)*
 
-Returns value of the netvar on the entity
+Returns value of the netvar on the entity, or `nil` on failure.
 
 `entindex` - The entity index you want to access.
 
@@ -118,11 +122,59 @@ Returns value of the netvar on the entity
 [Back to TOC](#gamesense-api-for-lua)
 
 client.userid_to_entindex
----------------
+-------------------------
 **syntax:** *entindex = userid_to_entindex(userid)*
 
-Returns an `entindex` from a `userid`.
+Returns an `entindex` from a `userid`, or `0` on failure.
 
 `userid` - The `userid` of the player.
+
+[Back to TOC](#gamesense-api-for-lua)
+
+client.draw_debug_text
+----------------------
+**syntax:** *draw_debug_text(x, y, z, line_offset, duration, r, g, b, a, ...)*
+
+Draws text at the specifid world position.
+
+`x`, `y`, `z` - 3D coordinates in world space where the text will be drawn.
+`line_offset` - Used for vertical alignment between multiple calls. Use `0` for the first line.
+`duration` - Time in seconds that the text will remain visible.
+`r`, `g`, `b`, `a` - Color (red, green, blue, alpha). Values should be within the range 1-255.
+
+[Back to TOC](#gamesense-api-for-lua)
+
+client.draw_hitboxes
+--------------------
+**syntax:** *draw_hitboxes(userid, duration, hitbox, r, g, b)*
+
+Draws one or more hitboxes.
+
+`userid` - The `userid` of the player.
+`duration` - Time in seconds that the text will remain visible.
+`hitbox` - Hitbox index to draw. Use `19` to draw all hitboxes.
+`r`, `g`, `b` - Color (red, green, blue). Values should be within the range 1-255.
+
+[Back to TOC](#gamesense-api-for-lua)
+
+client.RandomInt
+--------------------
+**syntax:** *val = RandomInt(min, max)*
+
+Generate a random integer between min and max.
+
+`min` - The lowest possible integer.
+`max` - The highest possible integer.
+
+[Back to TOC](#gamesense-api-for-lua)
+
+client.RandomFloat
+--------------------
+**syntax:** *val = RandomFloat(min, max)*
+
+Generate a random float between min and max.
+
+`min` - The lowest possible float.
+`max` - The highest possible float.
 
 [Back to TOC](#gamesense-api-for-lua)
