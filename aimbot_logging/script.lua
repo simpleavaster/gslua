@@ -15,10 +15,10 @@ in console to load/reload this script.
 
 local gameevents = require "gameevents"
 
+-- set_event_callback returns nil on success
 local err =
-	gs.set_event_callback('player_spawn', gameevents.player_spawn)
+	gs.set_event_callback('aim_fire', gameevents.aim_fire) 
 
 if err then
 	engine.log('set_event_callback failed: ', err)
 end
- 

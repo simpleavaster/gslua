@@ -6,6 +6,9 @@ local is_local_player = client.is_local_player
 
 local _M = {}
 
+--[[ 
+    short   userid          user ID on server 
+]]
 function _M.player_spawn(e)
 	local userid = e.userid
     if userid == nil then return end
@@ -31,4 +34,4 @@ function _M.player_spawn(e)
 end
 
 return _M
-
+ 

@@ -11,14 +11,13 @@ Place this file in the same folder as csgo.exe for now. Type
 in console to load/reload this script.
 
 ]]--
- 
 
-local gameevents = require "gameevents"
+
+local gameevents = require "gameevents" 
 
 local err =
-	gs.set_event_callback('player_spawn', gameevents.player_spawn)
+	gs.set_event_callback('player_death', gameevents.player_death)
 
 if err then
 	engine.log('set_event_callback failed: ', err)
 end
- 
