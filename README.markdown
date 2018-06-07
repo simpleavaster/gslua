@@ -158,7 +158,7 @@ Draws one or more hitboxes.
 [Back to TOC](#gamesense-api-for-lua)
 
 client.RandomInt
---------------------
+----------------
 **syntax:** *val = RandomInt(min, max)*
 
 Generate a random integer between min and max.
@@ -169,7 +169,7 @@ Generate a random integer between min and max.
 [Back to TOC](#gamesense-api-for-lua)
 
 client.RandomFloat
---------------------
+------------------
 **syntax:** *val = RandomFloat(min, max)*
 
 Generate a random float between min and max.
