@@ -12,7 +12,7 @@ GameSense API for Lua
 
 client.log
 ----------
-**syntax:** log(str, ...)
+**syntax:** *log(str, ...)*
 
 Output text to the console.
 
@@ -30,7 +30,7 @@ Output text to the console.
 
 client.exec
 -----------
-**syntax:** exec(cmds, ...)
+**syntax:** *exec(cmds, ...)*
 
 Execute console command(s).
 
@@ -51,7 +51,7 @@ Execute console command(s).
 
 client.cvar_get
 ---------------
-**syntax:** *val = cvar_get(convar_name)
+**syntax:** *val = cvar_get(convar_name)*
 
 Returns the value of a cvar.
 
@@ -71,7 +71,7 @@ Returns the value of a cvar.
 
 client.is_enemy
 ---------------
-**syntax:** *val = is_enemy(userid)
+**syntax:** *val = is_enemy(userid)*
 
 Returns true if the specified `userid` is on the enemy team.
 
@@ -81,7 +81,7 @@ Returns true if the specified `userid` is on the enemy team.
 
 client.is_local_player
 ---------------
-**syntax:** *val = is_local_player(userid)
+**syntax:** *val = is_local_player(userid)*
 
 Returns true if the specified `userid` is you.
 
@@ -91,7 +91,7 @@ Returns true if the specified `userid` is you.
 
 client.get_player_name
 ---------------
-**syntax:** *name = get_player_name(userid)
+**syntax:** *name = get_player_name(userid)*
 
 Returns the players name from `userid`, or nil if the user does not exist.
 
@@ -101,7 +101,7 @@ Returns the players name from `userid`, or nil if the user does not exist.
 
 client.read_entity_prop
 ---------------
-**syntax:** *val = read_entity_prop(entindex, netvar)
+**syntax:** *val = read_entity_prop(entindex, netvar)*
 
 Returns value of the netvar on the entity
 
@@ -119,7 +119,7 @@ Returns value of the netvar on the entity
 
 client.userid_to_entindex
 ---------------
-**syntax:** *entindex = userid_to_entindex(userid)
+**syntax:** *entindex = userid_to_entindex(userid)*
 
 Returns an `entindex` from a `userid`.
 
