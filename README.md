@@ -1,3 +1,3 @@
 # gslua
 
-# A collection of my scripts for gamesense.
+### A collection of my scripts for gamesense.
