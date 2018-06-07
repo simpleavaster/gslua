@@ -11,8 +11,8 @@ GameSense API for Lua
 * [client.userid_to_entindex](#clientuserid_to_entindex)
 * [client.draw_debug_text](#clientdraw_debug_text)
 * [client.draw_hitboxes](#clientdraw_hitboxes)
-* [client.RandomInt](#clientRandomInt)
-* [client.RandomFloat](#clientRandomFloat)
+* [client.RandomInt](#clientrandomint)
+* [client.RandomFloat](#clientrandomfloat)
 
 client.log
 ----------
