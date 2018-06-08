@@ -31,7 +31,8 @@ function aimbot(e)
     local hitchance = tonumber(string.format("%." .. 2 .. "f", e.hit_chance)) or 0 -- limit the precision of the float to 2 decimal places
 	local userid, damage, backtrack, teleported, highpriority = e.userid, e.damage, e.backtrack, e.teleported, e.high_priority
 
-    console_log("[aimbot] hitgroup=", group,
+	console_log("[aimbot] name=", get_player_name(userid),
+		" hitgroup=", group,
         " damage=", damage,
         " hitchance=", hitchance,
         " backtrack=", backtrack, 's',
@@ -86,14 +87,11 @@ function autobuy(e)
         primary = 'buy awp; '
     elseif r_eyegloss == "ak" then
         primary = 'buy ak47; '
-    elseif r_eyegloss == "negev" then
-        primary = 'buy negev; '
     end
-	
+
+    console_cmd('clear; ', primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')	
     if primary == '' then
-        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak negev")
-    else
-        console_cmd(primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')
+        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak")
     end
 end
 
