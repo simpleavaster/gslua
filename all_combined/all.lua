@@ -32,73 +32,92 @@ local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }
 local aimbot_logging_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Aimbot logging")
 if not aimbot_logging_checkbox then console_log("Failed to create checkbox") end
 
+local killsay_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Killsay")
+if not killsay_checkbox then console_log("Failed to create checkbox") end
+
+local autobuy_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Autobuy")
+if not autobuy_checkbox then console_log("Failed to create checkbox") end
+
 function aimbot(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
     local group = hitgroup_names[e.hitgroup + 1] or "?"
     local hitchance = tonumber(string.format("%." .. 2 .. "f", e.hit_chance)) or 0 -- limit the precision of the float to 2 decimal places
 	local userid, damage, backtrack, teleported, highpriority = e.userid, e.damage, e.backtrack, e.teleported, e.high_priority
-
-	console_log("[aimbot] name=", get_player_name(userid),
-		" hitgroup=", group,
-        " damage=", damage,
-        " hitchance=", hitchance,
-        " backtrack=", backtrack, 's',
-        " teleported=", teleported,
-        " highpriority=", highpriority)
+	local enabled = cheat_getvar(aimbot_logging_checkbox)
+	
+	if enabled then 
+		console_log("[aimbot] name=", get_player_name(userid),
+			" hitgroup=", group,
+			" damage=", damage,
+			" hitchance=", hitchance,
+			" backtrack=", backtrack, 's',
+			" teleported=", teleported,
+			" highpriority=", highpriority)
+	end
 end
 
 function killsay(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
 	local userid, attacker, health, armor, weapon, dmg_health, dmg_armor, hitgroup = e.userid, e.attacker, e.health, e.armor, e.weapon, e.dmg_health, e.dmg_armor, e.hitgroup
 	if userid == nil or attacker == nil or hitgroup < 1 or hitgroup > 8 then return end
-	
+
 	local head, chest, stomach, left_leg, right_leg, neck = 1, 2, 3, 6, 7, 8
 	local victim_name = get_player_name(userid) or "unknown"
+	local enabled = cheat_getvar(killsay_checkbox)
 
-	if is_local_player(attacker) then 
-		if tonumber(health) == 0 then
-			local hitbox_hit = ''
-			if hitgroup == head then
-				hitbox_hit = 'head '
-			elseif hitgroup == chest then
-				hitbox_hit = 'chest '
-			elseif hitgroup == stomach then
-				hitbox_hit = 'stomach '
-			elseif hitgroup == neck then
-				hitbox_hit = 'neck '
-			elseif hitgroup == left_leg then
-				hitbox_hit = 'toe '
-			elseif hitgroup == right_leg then 
-				hitbox_hit = 'toe '
-			end
+	if enabled then
+		if is_local_player(attacker) then 
+			if tonumber(health) == 0 then
+				local hitbox_hit = ''
+				if hitgroup == head then
+					hitbox_hit = 'head '
+				elseif hitgroup == chest then
+					hitbox_hit = 'chest '
+				elseif hitgroup == stomach then
+					hitbox_hit = 'stomach '
+				elseif hitgroup == neck then
+					hitbox_hit = 'neck '
+				elseif hitgroup == left_leg then
+					hitbox_hit = 'toe '
+				elseif hitgroup == right_leg then 
+					hitbox_hit = 'toe '
+				end
 
-			if hitbox_hit ~= '' then 
-				console_cmd('say Nice ', hitbox_hit, victim_name)
+				if hitbox_hit ~= '' then 
+					console_cmd('say Nice ', hitbox_hit, victim_name)
+				end
 			end
 		end
 	end
 end
 
 function autobuy(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
 	local userid = e.userid
     if userid == nil then return end
-    if not is_local_player(userid) then return end 
+	if not is_local_player(userid) then return end 
 
-    local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
-    if r_eyegloss == nil then return end
+	local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
+	if r_eyegloss == nil then return end
+	
+	if enabled then
+		if r_eyegloss == "auto" then
+			primary = 'buy scar20; buy g3sg1; '
+		elseif r_eyegloss == "scout" then
+			primary = 'buy scout; '
+		elseif r_eyegloss == "awp" then
+			primary = 'buy awp; '
+		elseif r_eyegloss == "ak" then
+			primary = 'buy ak47; '
+		elseif r_eyegloss == "negev" then
+			primary = 'buy negev; '
+		end
 
-    if r_eyegloss == "auto" then
-        primary = 'buy scar20; buy g3sg1; '
-    elseif r_eyegloss == "scout" then
-        primary = 'buy scout; '
-    elseif r_eyegloss == "awp" then
-        primary = 'buy awp; '
-    elseif r_eyegloss == "ak" then
-        primary = 'buy ak47; '
-    end
-
-    console_cmd('clear; ', primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')	
-    if primary == '' then
-        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak")
-    end
+		console_cmd(primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')
+		if primary == '' then
+			console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak negev")
+		end
+	end
 end
 
 local result =

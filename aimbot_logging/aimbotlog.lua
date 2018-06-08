@@ -28,17 +28,24 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
-function aim_fire(e)
+local aimbot_logging_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Aimbot logging")
+if not aimbot_logging_checkbox then console_log("Failed to create checkbox") end
+function aimbot(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
     local group = hitgroup_names[e.hitgroup + 1] or "?"
     local hitchance = tonumber(string.format("%." .. 2 .. "f", e.hit_chance)) or 0 -- limit the precision of the float to 2 decimal places
 	local userid, damage, backtrack, teleported, highpriority = e.userid, e.damage, e.backtrack, e.teleported, e.high_priority
-
-    console_log("[aimbot] hitgroup=", group,
-        " damage=", damage,
-        " hitchance=", hitchance,
-        " backtrack=", backtrack, 's',
-        " teleported=", teleported,
-        " highpriority=", highpriority)
+	local enabled = cheat_getvar(aimbot_logging_checkbox)
+	
+	if enabled then 
+		console_log("[aimbot] name=", get_player_name(userid),
+			" hitgroup=", group,
+			" damage=", damage,
+			" hitchance=", hitchance,
+			" backtrack=", backtrack, 's',
+			" teleported=", teleported,
+			" highpriority=", highpriority)
+	end
 end
 
 local result = gs.set_event_callback('aim_fire', aim_fire) 

@@ -29,31 +29,35 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
+local autobuy_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Autobuy")
+if not autobuy_checkbox then console_log("Failed to create checkbox") end
 function autobuy(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
 	local userid = e.userid
     if userid == nil then return end
-    if not is_local_player(userid) then return end 
+	if not is_local_player(userid) then return end 
 
-    local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
-    if r_eyegloss == nil then return end
-
-    if r_eyegloss == "auto" then
-        primary = 'buy scar20; buy g3sg1; '
-    elseif r_eyegloss == "scout" then
-        primary = 'buy scout; '
-    elseif r_eyegloss == "awp" then
-        primary = 'buy awp; '
-    elseif r_eyegloss == "ak" then
-        primary = 'buy ak47; '
-    elseif r_eyegloss == "negev" then
-        primary = 'buy negev; '
-    end
+	local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
+	if r_eyegloss == nil then return end
 	
-    if primary == '' then
-        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak negev")
-    else
-        console_cmd(primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')
-    end
+	if enabled then
+		if r_eyegloss == "auto" then
+			primary = 'buy scar20; buy g3sg1; '
+		elseif r_eyegloss == "scout" then
+			primary = 'buy scout; '
+		elseif r_eyegloss == "awp" then
+			primary = 'buy awp; '
+		elseif r_eyegloss == "ak" then
+			primary = 'buy ak47; '
+		elseif r_eyegloss == "negev" then
+			primary = 'buy negev; '
+		end
+
+		console_cmd(primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')
+		if primary == '' then
+			console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak negev")
+		end
+	end
 end
 
 local err = gs.set_event_callback('player_spawn', autobuy)

@@ -28,32 +28,38 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
+local killsay_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Killsay")
+if not killsay_checkbox then console_log("Failed to create checkbox") end
 function killsay(e)
+	local enabled = cheat_getvar(autobuy_checkbox)
 	local userid, attacker, health, armor, weapon, dmg_health, dmg_armor, hitgroup = e.userid, e.attacker, e.health, e.armor, e.weapon, e.dmg_health, e.dmg_armor, e.hitgroup
 	if userid == nil or attacker == nil or hitgroup < 1 or hitgroup > 8 then return end
-	
+
 	local head, chest, stomach, left_leg, right_leg, neck = 1, 2, 3, 6, 7, 8
 	local victim_name = get_player_name(userid) or "unknown"
+	local enabled = cheat_getvar(killsay_checkbox)
 
-	if is_local_player(attacker) then 
-		if tonumber(health) == 0 then
-			local hitbox_hit = ''
-			if hitgroup == head then
-				hitbox_hit = 'head '
-			elseif hitgroup == chest then
-				hitbox_hit = 'chest '
-			elseif hitgroup == stomach then
-				hitbox_hit = 'stomach '
-			elseif hitgroup == neck then
-				hitbox_hit = 'neck '
-			elseif hitgroup == left_leg then
-				hitbox_hit = 'toe '
-			elseif hitgroup == right_leg then 
-				hitbox_hit = 'toe '
-			end
+	if enabled then
+		if is_local_player(attacker) then 
+			if tonumber(health) == 0 then
+				local hitbox_hit = ''
+				if hitgroup == head then
+					hitbox_hit = 'head '
+				elseif hitgroup == chest then
+					hitbox_hit = 'chest '
+				elseif hitgroup == stomach then
+					hitbox_hit = 'stomach '
+				elseif hitgroup == neck then
+					hitbox_hit = 'neck '
+				elseif hitgroup == left_leg then
+					hitbox_hit = 'toe '
+				elseif hitgroup == right_leg then 
+					hitbox_hit = 'toe '
+				end
 
-			if hitbox_hit ~= '' then 
-				console_cmd('say Nice ', hitbox_hit, victim_name)
+				if hitbox_hit ~= '' then 
+					console_cmd('say Nice ', hitbox_hit, victim_name)
+				end
 			end
 		end
 	end
