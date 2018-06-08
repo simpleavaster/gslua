@@ -247,6 +247,22 @@ client.draw_text
 
 Draw text at the given screen coordinates.
 
+`paint_context` - The context in which the text should be drawn in.
+
+`x`, `y` - Coordinate offset from the top left of the display where the text will be drawn.
+
+`r`, `g`, `b`, `a` - Color (red, green, blue, alpha). Values should be within the range 1-255.
+
+`flags` - Flags which modify the style and origin of the text, or `nil` to draw default.
+    
+* `+` - Large text, used for the on-screen indicators.
+* `-` - Small text, used for Flags.
+* `c` - Center text at origin.
+
+`max_width` - *todo*
+
+`text` - The text you want to draw.
+
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
 client.draw_rectangle
@@ -254,6 +270,14 @@ client.draw_rectangle
 **syntax:** *val = draw_rectangle(paint_context, x, y, w, h, r, g, b, a)*
 
 Draw a rectangle at the given screen coordinates.
+
+`paint_context` - The context in which the rectangle should be drawn in.
+
+`x`, `y` - Coordinate offset from the top left of the display where the rectangle will be drawn.
+
+`w`, `h` - The width and height of the rectangle.
+
+`r`, `g`, `b`, `a` - Color (red, green, blue, alpha). Values should be within the range 1-255.
 
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
@@ -263,6 +287,8 @@ client.world_to_screen
 **syntax:** *x, y = world_to_screen(paint_ctx, x, y, z)*
 
 Get the screen coordinates for the world position. Returns nil if the position is behind you (not visible).
+
+*todo*
 
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
