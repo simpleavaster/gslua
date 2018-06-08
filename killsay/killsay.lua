@@ -18,6 +18,8 @@ local paint_draw_rectangle = client.draw_rectangle
 local cheat_setvar = gs.set_var
 local cheat_getvar = gs.get_var
 local cheat_create_menu_checkbox = gs.create_menu_checkbox
+local cheat_create_menu_slider = gs.create_menu_slider
+local cheat_create_menu_button = gs.create_menu_button
 
 local tonumber = tonumber
 local math_floor = math.floor

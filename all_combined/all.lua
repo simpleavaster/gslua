@@ -18,6 +18,8 @@ local paint_draw_rectangle = client.draw_rectangle
 local cheat_setvar = gs.set_var
 local cheat_getvar = gs.get_var
 local cheat_create_menu_checkbox = gs.create_menu_checkbox
+local cheat_create_menu_slider = gs.create_menu_slider
+local cheat_create_menu_button = gs.create_menu_button
 
 local tonumber = tonumber
 local math_floor = math.floor
@@ -25,6 +27,10 @@ local math_floor = math.floor
 local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right arm", "left leg", "right leg", "neck", "?", "body" }
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
+
+-- tabs = AA, LEGIT, MISC, PLAYERS, RAGE, SKINS, VIS
+local aimbot_logging_checkbox = cheat_create_menu_checkbox("MISC", "Miscellaneous", "Aimbot logging")
+if not aimbot_logging_checkbox then console_log("Failed to create checkbox") end
 
 function aimbot(e)
     local group = hitgroup_names[e.hitgroup + 1] or "?"
