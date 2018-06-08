@@ -26,22 +26,10 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
-local _M = {}
- 
---[[
-aim_fire is a custom event that is called whenever the rage aimbot shoots
-
-int     hitgroup       targeted hitbox group
-int     damage         estimated shot damage
-float   hit_chance     hit chance percentage
-float   backtrack      time in seconds that the player was backtracked
-bool    teleported     true if player is breaking lag compensation
-bool    high_priority  true if player is not using fake angles or is otherwise easier to hit
-]]--
-function _M.aim_fire(e)
-    local group = hitgroup_names[e.hitgroup] or "?"
+function aim_fire(e)
+    local group = hitgroup_names[e.hitgroup + 1] or "?"
     local hitchance = tonumber(string.format("%." .. 2 .. "f", e.hit_chance)) or 0 -- limit the precision of the float to 2 decimal places
-	local damage, backtrack, teleported, highpriority = e.damage, e.backtrack, e.teleported, e.high_priority
+	local userid, damage, backtrack, teleported, highpriority = e.userid, e.damage, e.backtrack, e.teleported, e.high_priority
 
     console_log("[aimbot] hitgroup=", group,
         " damage=", damage,
@@ -51,4 +39,8 @@ function _M.aim_fire(e)
         " highpriority=", highpriority)
 end
 
-return _M
+local result = gs.set_event_callback('aim_fire', aim_fire) 
+
+if result then
+	engine.log('set_event_callback failed: ', result)
+end

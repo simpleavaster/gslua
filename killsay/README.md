@@ -1,1 +1,0 @@
-Says something everytime you kill someone or are the assister in killing someone 

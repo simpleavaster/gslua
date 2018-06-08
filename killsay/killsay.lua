@@ -26,32 +26,38 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
---[[ 
-    short   userid          user ID on server 
-]]
-function _M.player_spawn(e)
-	local userid = e.userid
-    if userid == nil then return end
-    if not is_local_player(userid) then return end 
+function killsay(e)
+	local userid, attacker, health, armor, weapon, dmg_health, dmg_armor, hitgroup = e.userid, e.attacker, e.health, e.armor, e.weapon, e.dmg_health, e.dmg_armor, e.hitgroup
+	if userid == nil or attacker == nil or hitgroup < 1 or hitgroup > 8 then return end
+	
+	local head, chest, stomach, left_leg, right_leg, neck = 1, 2, 3, 6, 7, 8
+	local victim_name = get_player_name(userid) or "unknown"
 
-    local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
-    if r_eyegloss == nil then return end
+	if is_local_player(attacker) then 
+		if tonumber(health) == 0 then
+			local hitbox_hit = ''
+			if hitgroup == head then
+				hitbox_hit = 'head '
+			elseif hitgroup == chest then
+				hitbox_hit = 'chest '
+			elseif hitgroup == stomach then
+				hitbox_hit = 'stomach '
+			elseif hitgroup == neck then
+				hitbox_hit = 'neck '
+			elseif hitgroup == left_leg then
+				hitbox_hit = 'toe '
+			elseif hitgroup == right_leg then 
+				hitbox_hit = 'toe '
+			end
 
-    if r_eyegloss == "auto" then
-        primary = 'buy scar20; buy g3sg1; '
-    elseif r_eyegloss == "scout" then
-        primary = 'buy scout; '
-    elseif r_eyegloss == "awp" then
-        primary = 'buy awp; '
-    elseif r_eyegloss == "ak" then
-        primary = 'buy ak47; '
-    end
-
-    console_cmd('clear; ', primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')	
-    if primary == '' then
-        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak")
-    end
+			if hitbox_hit ~= '' then 
+				console_cmd('say Nice ', hitbox_hit, victim_name)
+			end
+		end
+	end
 end
 
-return _M
- 
+local result = gs.set_event_callback('player_hurt', killsay)
+if result then
+    console_log('set_event_callback failed: ', result)
+end

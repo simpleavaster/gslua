@@ -1,3 +1,4 @@
+--start of definitions
 local console_log = client.log
 local console_cmd = client.exec
 local is_enemy = client.is_enemy
@@ -18,6 +19,8 @@ local paint_draw_rectangle = client.draw_rectangle
 local cheat_setvar = gs.set_var
 local cheat_getvar = gs.get_var
 local cheat_create_menu_checkbox = gs.create_menu_checkbox
+local cheat_create_menu_slider = gs.create_menu_slider
+local cheat_create_menu_button = gs.create_menu_button
 
 local tonumber = tonumber
 local math_floor = math.floor
@@ -26,38 +29,39 @@ local hitgroup_names = { "body", "head", "chest", "stomach", "left arm", "right 
 local hitbox_names = { "head", "neck", "pelvis", "stomach", "spine3", "spine2", "spine1", "left thigh", "right thigh", "left calf", "right calf", "left foot", "right foot", "left hand", "right hand", "left upperarm", "left forearm", "right upperarm", "right forearm", "all" }
 local group_to_hitboxes = { { 0 }, { 4, 5, 6 }, { 2, 3 }, { 15, 16 }, { 17, 18 }, { 7, 9, 11 }, { 8, 10, 12 }, { 1 } }
 
-local _M = {}
+function autobuy(e)
+	local userid = e.userid
+    if userid == nil then return end
+    if not is_local_player(userid) then return end 
 
---[[
-short   userid          user ID who died
-short   attacker        user ID who killed
-short   assister        user ID who assisted in the kill
-string  weapon          weapon name killer used
-string  weapon_itemid   inventory item id of weapon killer used
-string  weapon_fauxitemid faux item id of weapon killer used
-string  weapon_originalowner_xuid
-bool    headshot        signals a headshot
-short   dominated       did killer dominate victim with this kill
-short   revenge         did killer get revenge on victim with this kill
-short   penetrated      number of objects shot penetrated before killing target
-]]--
-function _M.player_death(e)
-	local userid, attacker, assister, headshot = e.userid, e.attacker, e.assister, e.headshot
-	if userid == nil or attacker == nil then return end
+    local r_eyegloss, primary = get_cvar("r_eyegloss"), ''
+    if r_eyegloss == nil then return end
 
-	local victim_name = get_player_name(userid) or "unknown"
-	local attacker_name = get_player_name(attacker) or "unknown"
-	local weapon = e.weapon or "unknown"
-
-	if is_local_player(attacker) then
-		if e.headshot then
-			console_cmd("say Easy one tap ", victim_name, ".")
-		else
-			console_cmd("say Easy baim ", victim_name, ".")
-		end
-    elseif is_local_player(assister) then 
-        console_cmd("say Easy assist ", victim_name, ".")
+    if r_eyegloss == "auto" then
+        primary = 'buy scar20; buy g3sg1; '
+    elseif r_eyegloss == "scout" then
+        primary = 'buy scout; '
+    elseif r_eyegloss == "awp" then
+        primary = 'buy awp; '
+    elseif r_eyegloss == "ak" then
+        primary = 'buy ak47; '
+    elseif r_eyegloss == "negev" then
+        primary = 'buy negev; '
+    end
+	
+    if primary == '' then
+        console_log("[autobuy] Invalid r_eyegloss value, possible values are auto scout awp ak negev")
+    else
+        console_cmd(primary, 'buy deagle; buy taser; buy defuser; buy vesthelm; buy molotov; buy incgrenade; buy hegrenade; buy smokegrenade')
     end
 end
 
-return _M
+local err = gs.set_event_callback('player_spawn', autobuy)
+if err then
+    console_log('set_event_callback failed: ', err)
+end
+
+console_log('[autobuy] How to use')
+console_log('[autobuy] Set r_eyegloss to auto or awp or scout or ak or negev')
+console_log('[autobuy] Example: r_eyegloss auto')
+ 
