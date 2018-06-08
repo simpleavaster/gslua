@@ -1,6 +1,10 @@
 GameSense API for Lua
 =====================
 
+* [gs.set_event_callback](#gsset_event_callback)
+* [gs.create_menu_checkbox](#gscreate_menu_checkbox)
+* [gs.set_var](#gsset_var)
+* [gs.get_var](#gsget_var)
 * [client.log](#clientlog)
 * [client.exec](#clientexec)
 * [client.cvar_get](#clientcvar_get)
@@ -11,8 +15,58 @@ GameSense API for Lua
 * [client.userid_to_entindex](#clientuserid_to_entindex)
 * [client.draw_debug_text](#clientdraw_debug_text)
 * [client.draw_hitboxes](#clientdraw_hitboxes)
-* [client.RandomInt](#clientrandomint)
-* [client.RandomFloat](#clientrandomfloat)
+* [client.random_int](#clientrandom_int)
+* [client.random_float](#clientrandom_float)
+* [client.draw_text](#clientdraw_text)
+* [client.draw_rectangle](#clientdraw_rectangle)
+* [client.world_to_screen](#clientworld_to_screen)
+
+gs.set_event_callback
+---------------------
+**syntax:** *set_event_callback(event_name, callback_function)*
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+gs.create_menu_checkbox
+---------------------
+**syntax:** *var = create_menu_checkbox(tab_name, container_name, checkbox_name)*
+
+Returns nil on failure. Tab names must be one of: AA, LEGIT, MISC, PLAYERS, RAGE, SKINS, VIS.
+
+The result of this function is a special type that can be only be used with gs.set_var and gs.get_var. Do not call this from an event callback. See gs.get_var for an example.
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+gs.set_var
+---------------------
+**syntax:** *set_var(var, enabled)*
+
+Programmatically check/uncheck a checkbox that you created with gs.create_menu_checkbox
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+gs.get_var
+---------------------
+**syntax:** *get_var(var)*
+
+Check whether or not a user-created checkbox is checked.
+
+Example:
+```lua
+
+local test_item = gs.create_menu_checkbox("AA", "Other", "Test variable 2")
+if not test_item then
+    console_log("create_menu_checkbox failed")
+end
+
+-- inside an event function
+    if gs.get_var(test_item) then
+        -- checkbox is checked
+        -- implement feature here
+    end
+```
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
 client.log
 ----------
@@ -163,9 +217,9 @@ Draws one or more hitboxes.
 
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
-client.RandomInt
+client.random_int
 ----------------
-**syntax:** *val = RandomInt(min, max)*
+**syntax:** *val = random_int(min, max)*
 
 Generate a random integer between min and max.
 
@@ -175,9 +229,9 @@ Generate a random integer between min and max.
 
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
 
-client.RandomFloat
+client.random_float
 ------------------
-**syntax:** *val = RandomFloat(min, max)*
+**syntax:** *val = random_float(min, max)*
 
 Generate a random float between min and max.
 
@@ -186,3 +240,30 @@ Generate a random float between min and max.
 `max` - The highest possible float.
 
 <sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+client.draw_text
+------------------
+**syntax:** *val = draw_text(paint_context, x, y, r, g, b, a, flags, max_width, text, ...)*
+
+Draw text at the given screen coordinates.
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+client.draw_rectangle
+------------------
+**syntax:** *val = draw_rectangle(paint_context, x, y, w, h, r, g, b, a)*
+
+Draw a rectangle at the given screen coordinates.
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+
+client.world_to_screen
+------------------
+**syntax:** *x, y = world_to_screen(paint_ctx, x, y, z)*
+
+Get the screen coordinates for the world position. Returns nil if the position is behind you (not visible).
+
+<sup>[Back to TOC](#gamesense-api-for-lua)</sup>
+
+
