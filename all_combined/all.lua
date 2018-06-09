@@ -68,8 +68,8 @@ function aimbot(e)
 	local enabled = ui_get(aimbot_logging_checkbox)
 
 	local target_name = entity_get_player_name(target) or "unknown"
-	
-	if enabled then 
+
+	if enabled then
 		client_console_log("[aimbot] target=", target_name,
 			" hitgroup=", group,
 			" damage=", damage,
@@ -87,9 +87,9 @@ function killsay(e)
 	local head, chest, stomach, left_leg, right_leg, neck = 1, 2, 3, 6, 7, 8
 	local victim_name = entity_get_player_name(client_userid_to_entindex(userid)) or "unknown"
 	local enabled = ui_get(killsay_checkbox)
-	
+
 	if enabled then
-		if is_local_player_userid(attacker) then 
+		if is_local_player_userid(attacker) then
 			if to_number(health) == 0 then
 				local hitbox_hit = ''
 				if hitgroup == head then
@@ -102,12 +102,12 @@ function killsay(e)
 					hitbox_hit = 'neck '
 				elseif hitgroup == left_leg then
 					hitbox_hit = 'toe '
-				elseif hitgroup == right_leg then 
+				elseif hitgroup == right_leg then
 					hitbox_hit = 'toe '
 				end
 
-				if hitbox_hit ~= '' then 
-					client_console_cmd('say Nice ', hitbox_hit, victim_name)
+				if hitbox_hit ~= '' then
+					client_console_cmd('say "Nice ', hitbox_hit, victim_name, '"')
 				end
 			end
 		end
@@ -122,7 +122,7 @@ function autobuy(e)
 
 	local r_eyegloss, primary = client_get_cvar("r_eyegloss"), ''
 	if r_eyegloss == nil then return end
-	
+
 	if enabled then
 		if r_eyegloss == "auto" then
 			primary = 'buy scar20; buy g3sg1; '
@@ -146,7 +146,7 @@ end
 local result =
 	client_set_event_callback('aim_fire', aimbot) or
 	client_set_event_callback('player_hurt', killsay) or
-	client_set_event_callback('player_spawn', autobuy) 
+	client_set_event_callback('player_spawn', autobuy)
 
 if result then
 	engine.log('set_event_callback failed: ', result)
