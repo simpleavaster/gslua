@@ -143,10 +143,27 @@ function autobuy(e)
 	end
 end
 
+local context = nil 
+function paint(ctx)
+	context = ctx
+end
+
+function bulletimpact(e)
+	local userid, x, y, z = e.userid, e.x, e.y, e.z
+	if not is_local_player_userid(userid) then return end
+	local origin = entity_get_prop(entity_get_local_player(), "m_vecOrigin")
+	local aX, aY = client_world_to_screen(context, origin[1], origin[2], origin[3])
+	local bX, bY = client_world_to_screen(context, x, y, z)
+
+	client_console_log("test: ", ax)
+end
+
 local result =
 	client_set_event_callback('aim_fire', aimbot) or
 	client_set_event_callback('player_hurt', killsay) or
-	client_set_event_callback('player_spawn', autobuy) 
+	client_set_event_callback('player_spawn', autobuy) or
+	client_set_event_callback('paint', paint) or
+	client_set_event_callback('bullet_impact', bulletimpact) 
 
 if result then
 	engine.log('set_event_callback failed: ', result)
