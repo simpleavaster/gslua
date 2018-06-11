@@ -67,8 +67,6 @@ local function on_paint_hud(ctx)
     local c4_holder = entity_get_prop(playerresource, "m_iPlayerC4")
     local gameinfo = entity.get_all("CCSGameRulesProxy")
 
-    local weapon = 
-
     if armor > 1 and armor <= 100 then
         has_kevlar = true
     else
