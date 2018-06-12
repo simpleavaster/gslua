@@ -87,8 +87,8 @@ local function draw_radar(ctx)
     local lp_viewang_y = entity_get_prop(local_player, "m_angEyeAngles[1]")
     local size = 150
     draw_container(ctx, center_x-(size/2), center_y-(size/2), size, size)
-    
-    client_draw_rectangle(ctx, center_x, center_y, 5, 5, 255, 0, 0, 255)
+
+    client_draw_rectangle(ctx, center_x-2, center_y-2, 4, 4, 255, 255, 255, 255)
 
     local players = entity_get_players()
     for i=1, #players do
@@ -105,7 +105,7 @@ local function draw_radar(ctx)
 
         local rnp_x, rnp_y = rotate_point(np_x, np_y, center_x, center_y, lp_viewang_y-90)
 
-        client_draw_rectangle(ctx, rnp_x, rnp_y, 5, 5, 255, 255, 255, 255)
+        client_draw_rectangle(ctx, rnp_x-3, rnp_y-3, 6, 6, 255, 0, 0, 255)
     end
 end
 
