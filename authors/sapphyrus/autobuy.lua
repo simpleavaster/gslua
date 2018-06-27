@@ -134,7 +134,6 @@ local function run_buybot(e)
 	table_insert(commands, "use weapon_knife;")
 
 	local command = table_concat(commands, "")
-	client.log(command)
 	client_console_cmd(command)
 	--client_delay_call(delay, client_console_cmd, command)
 
