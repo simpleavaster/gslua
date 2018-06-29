@@ -99,7 +99,7 @@ local function accumulate_fps()
     
     local fps = 1 / accum
     local time_since_update = rt - last_update_time
-    if abs(fps - fps_prev) > 4 or time_since_update > 1 then
+    if math_abs(fps - fps_prev) > 4 or time_since_update > 1 then
         fps_prev = fps
         last_update_time = rt
     else
