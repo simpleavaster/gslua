@@ -106,7 +106,7 @@ local function accumulate_fps()
         fps = fps_prev
     end
     
-    return floor(fps + 0.5)
+    return math_floor(fps + 0.5)
 end
 
 local function on_paint(ctx)
