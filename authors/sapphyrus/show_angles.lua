@@ -13,6 +13,7 @@ local length = 40
 
 local Math = require "math"
 local math_floor = Math.floor
+local sin, cos = math.sin, math.cos
 
 local fake_r, fake_g, fake_b, fake_a = 28, 132, 255, 255
 local lby_r, lby_g, lby_b, lby_a = 255, 0, 0, 255
