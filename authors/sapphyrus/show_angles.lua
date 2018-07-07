@@ -3,21 +3,28 @@ local client_latency, client_log, client_draw_rectangle, client_draw_circle_outl
 local client_visible, client_exec, client_draw_circle, client_delay_call, client_world_to_screen, client_draw_hitboxes, client_get_cvar, client_draw_line, client_camera_angles, client_draw_debug_text, client_random_int, client_random_float = client.visible, client.exec, client.draw_circle, client.delay_call, client.world_to_screen, client.draw_hitboxes, client.get_cvar, client.draw_line, client.camera_angles, client.draw_debug_text, client.random_int, client.random_float 
 local entity_get_local_player, entity_is_enemy, entity_get_player_name, entity_get_all, entity_set_prop, entity_get_player_weapon, entity_hitbox_position, entity_get_prop, entity_get_players, entity_get_classname = entity.get_local_player, entity.is_enemy, entity.get_player_name, entity.get_all, entity.set_prop, entity.get_player_weapon, entity.hitbox_position, entity.get_prop, entity.get_players, entity.get_classname 
 local globals_mapname, globals_tickcount, globals_realtime, globals_absoluteframetime, globals_tickinterval, globals_curtime, globals_frametime, globals_maxplayers = globals.mapname, globals.tickcount, globals.realtime, globals.absoluteframetime, globals.tickinterval, globals.curtime, globals.frametime, globals.maxplayers 
-local ui_new_slider, ui_new_combobox, ui_reference, ui_set_visible, ui_set_callback, ui_set, ui_new_checkbox, ui_new_hotkey, ui_new_button, ui_new_multiselect, ui_get = ui.new_slider, ui.new_combobox, ui.reference, ui.set_visible, ui.set_callback, ui.set, ui.new_checkbox, ui.new_hotkey, ui.new_button, ui.new_multiselect, ui.get 
+local ui_new_slider, ui_new_combobox, ui_reference, ui_set_visible, ui_new_color_picker, ui_set_callback, ui_set, ui_new_checkbox, ui_new_hotkey, ui_new_button, ui_new_multiselect, ui_get = ui.new_slider, ui.new_combobox, ui.reference, ui.set_visible, ui.new_color_picker, ui.set_callback, ui.set, ui.new_checkbox, ui.new_hotkey, ui.new_button, ui.new_multiselect, ui.get 
+local math_ceil, math_tan, math_correctRadians, math_fact, math_log10, math_randomseed, math_cos, math_sinh, math_random, math_huge, math_pi, math_max, math_atan2, math_ldexp, math_floor, math_sqrt = math.ceil, math.tan, math.correctRadians, math.fact, math.log10, math.randomseed, math.cos, math.sinh, math.random, math.huge, math.pi, math.max, math.atan2, math.ldexp, math.floor, math.sqrt 
+local math_sqrt, math_deg, math_atan, math_fmod, math_acos, math_pow, math_abs, math_min, math_sin, math_frexp, math_log, math_tanh, math_exp, math_modf, math_cosh, math_asin, math_rad = math.sqrt, math.deg, math.atan, math.fmod, math.acos, math.pow, math.abs, math.min, math.sin, math.frexp, math.log, math.tanh, math.exp, math.modf, math.cosh, math.asin, math.rad 
+local table_maxn, table_foreach, table_sort, table_remove, table_foreachi, table_move, table_getn, table_concat, table_insert = table.maxn, table.foreach, table.sort, table.remove, table.foreachi, table.move, table.getn, table.concat, table.insert 
 --end of local variables 
 
 local show_angles_reference = ui.new_multiselect("VISUALS", "Other ESP", "Show Anti-aimbot angles", "Real", "Fake", "LBY", "Camera")
 
+local real_length_reference = ui.new_slider("VISUALS", "Other ESP", "Real Distance / Color", 10, 80, 30, true, "u")
+local real_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "Real Color", 28, 132, 255, 220)
+
+local fake_length_reference = ui.new_slider("VISUALS", "Other ESP", "Fake Distance / Color", 10, 80, 30, true, "u")
+local fake_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "Fake Color", 0, 164, 52, 220)
+
+local lby_length_reference = ui.new_slider("VISUALS", "Other ESP", "LBY Distance / Color", 10, 80, 30, true, "u")
+local lby_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "LBY Color", 255, 0, 0, 220)
+
+local camera_length_reference = ui.new_slider("VISUALS", "Other ESP", "Camera Distance / Color", 10, 80, 30, true, "u")
+local camera_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "Camera Color", 255, 255, 255, 220)
+
 local boxSize = 30
 local length = 40
-
-local Math = require "math"
-local math_floor = Math.floor
-local sin, cos = math.sin, math.cos
-
-local fake_r, fake_g, fake_b, fake_a = 28, 132, 255, 255
-local lby_r, lby_g, lby_b, lby_a = 255, 0, 0, 255
-local camera_r, camera_g, camera_b, camera_a = 255, 255, 255, 255
 
 local function contains(table, val)
 	for i=1,#table do
@@ -27,6 +34,37 @@ local function contains(table, val)
 	end
 	return false
 end
+
+local function on_show_angles_change()
+
+	--temporarily disable real, would lead to wrong results
+	local new = {}
+	local value = ui_get(show_angles_reference)
+	if contains(value, "Real") then
+		for i=1, #value do
+			if value[i] ~= "Real" then
+				table_insert(new, value[i])
+			end
+		end
+		ui_set(show_angles_reference, new)
+	end
+	--end of temp disable block
+
+	local value = ui_get(show_angles_reference)
+	ui_set_visible(real_length_reference, contains(value, "Real"))
+	ui_set_visible(real_color_reference, contains(value, "Real"))
+
+	ui_set_visible(fake_length_reference, contains(value, "Fake"))
+	ui_set_visible(fake_color_reference, contains(value, "Fake"))
+
+	ui_set_visible(lby_length_reference, contains(value, "LBY"))
+	ui_set_visible(lby_color_reference, contains(value, "LBY"))
+
+	ui_set_visible(camera_length_reference, contains(value, "Camera"))
+	ui_set_visible(camera_color_reference, contains(value, "Camera"))
+end
+
+ui_set_callback(show_angles_reference, on_show_angles_change)
 
 local function on_paint(ctx)
 	local value = ui_get(show_angles_reference)
@@ -44,11 +82,11 @@ local function on_paint(ctx)
 		if worldX == nil or worldY == nil then return end
 
 		if contains(value, "Fake") then
+			local fake_r, fake_g, fake_b, fake_a = ui_get(fake_color_reference)
+			local fake_distance = ui_get(fake_length_reference)
 			local _, fakeYaw, _ = entity_get_prop(entity_get_local_player(), "m_angEyeAngles")
-			locationXFake = locationX + cos(math.rad(fakeYaw)) * length
-			locationYFake = locationY + sin(math.rad(fakeYaw)) * length
-			locationXFakeText = locationX + cos(math.rad(fakeYaw)) * length+1
-			locationYFakeText = locationY + sin(math.rad(fakeYaw)) * length+1
+			locationXFake = locationX + math_cos(math_rad(fakeYaw)) * fake_distance
+			locationYFake = locationY + math_sin(math_rad(fakeYaw)) * fake_distance
 
 			local worldXFake, worldYFake = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
 			local worldXFakeText, worldYFakeText = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
@@ -60,14 +98,14 @@ local function on_paint(ctx)
 		end
 
 		if contains(value, "LBY") then
+			local lby_r, lby_g, lby_b, lby_a = ui_get(lby_color_reference)
+			local lby_distance = ui_get(lby_length_reference)
 			local lbyYaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
-			locationXLBY = locationX + cos(math.rad(lbyYaw)) * length-2
-			locationYLBY = locationY + sin(math.rad(lbyYaw)) * length-2
-			locationXLBYText = locationX + cos(math.rad(lbyYaw)) * length-2+1
-			locationYLBYText = locationY + sin(math.rad(lbyYaw)) * length-2+1
+			locationXLBY = locationX + math_cos(math_rad(lbyYaw)) * lby_distance
+			locationYLBY = locationY + math_sin(math_rad(lbyYaw)) * lby_distance
 
 			local worldXLBY, worldYLBY = client_world_to_screen(ctx, locationXLBY, locationYLBY, locationZ)
-			local worldXLBYText, worldYLBYText = client_world_to_screen(ctx, locationXLBYText, locationYLBYText, locationZ)
+			local worldXLBYText, worldYLBYText = client_world_to_screen(ctx, locationXLBY, locationYLBY, locationZ)
 
 			if worldXLBY ~= nil then
 				client_draw_line(ctx, worldX, worldY, worldXLBY, worldYLBY, lby_r, lby_g, lby_b, lby_a)
@@ -76,14 +114,14 @@ local function on_paint(ctx)
 		end
 
 		if contains(value, "Camera") then
+			local camera_r, camera_g, camera_b, camera_a = ui_get(camera_color_reference)
+			local camera_distance = ui_get(camera_length_reference)
 			local _, cameraYaw = client_camera_angles()
-			locationXCamera = locationX + cos(math.rad(cameraYaw)) * length-2
-			locationYCamera = locationY + sin(math.rad(cameraYaw)) * length-2
-			locationXCameraText = locationX + cos(math.rad(cameraYaw)) * length-2+1
-			locationYCameraText = locationY + sin(math.rad(cameraYaw)) * length-2+1
+			locationXCamera = locationX + math_cos(math_rad(cameraYaw)) * camera_distance
+			locationYCamera = locationY + math_sin(math_rad(cameraYaw)) * camera_distance
 
 			local worldXCamera, worldYCamera = client_world_to_screen(ctx, locationXCamera, locationYCamera, locationZ)
-			local worldXCameraText, worldYCameraText = client_world_to_screen(ctx, locationXCameraText, locationYCameraText, locationZ)
+			local worldXCameraText, worldYCameraText = client_world_to_screen(ctx, locationXCamera, locationYCamera, locationZ)
 
 			if worldXCamera ~= nil then
 				client_draw_line(ctx, worldX, worldY, worldXCamera, worldYCamera, camera_r, camera_g, camera_b, camera_a)
@@ -91,8 +129,9 @@ local function on_paint(ctx)
 			end
 		end
 
-
-
+		if #value > 0 then
+			client_draw_circle(ctx, worldX, worldY, 17, 17, 17, 255, 2, 0, 1)
+		end
 	end
 end
 

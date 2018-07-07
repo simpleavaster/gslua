@@ -1,4 +1,4 @@
-local to_dump = {{name="client", table=client}, {name="entity", table=entity}, {name="globals", table=globals}, {name="ui", table=ui}}
+local to_dump = {{name="client", table=client}, {name="entity", table=entity}, {name="globals", table=globals}, {name="ui", table=ui}, {name="math", table=math}, {name="table", table=table}}
 local table_insert = table.insert
 local table_remove = table.remove
 local table_concat = table.concat
