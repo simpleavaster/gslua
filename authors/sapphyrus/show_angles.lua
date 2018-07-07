@@ -36,20 +36,6 @@ local function contains(table, val)
 end
 
 local function on_show_angles_change()
-
-	--temporarily disable real, would lead to wrong results
-	local new = {}
-	local value = ui_get(show_angles_reference)
-	if contains(value, "Real") then
-		for i=1, #value do
-			if value[i] ~= "Real" then
-				table_insert(new, value[i])
-			end
-		end
-		ui_set(show_angles_reference, new)
-	end
-	--end of temp disable block
-
 	local value = ui_get(show_angles_reference)
 	ui_set_visible(real_length_reference, contains(value, "Real"))
 	ui_set_visible(real_color_reference, contains(value, "Real"))
@@ -67,19 +53,49 @@ end
 ui_set_callback(show_angles_reference, on_show_angles_change)
 
 local function on_paint(ctx)
+	local local_player = entity_get_local_player()
+
+	if local_player == nil then
+		return
+	end
+
+	if entity_get_prop(local_player, "m_lifeState") ~= 0 then
+		return
+	end
+
 	local value = ui_get(show_angles_reference)
 
 	if value == {} then
 		return
 	end
 
-	local locationX, locationY, locationZ = entity_get_prop(entity_get_local_player(), "m_vecOrigin")
+	local locationX, locationY, locationZ = entity_get_prop(local_player, "m_vecOrigin")
 
 	if locationX then
 
 		local worldX, worldY = client_world_to_screen(ctx, locationX, locationY, locationZ)
 
 		if worldX == nil or worldY == nil then return end
+
+		if contains(value, "Real") then
+			local real_r, real_g, real_b, real_a = ui_get(real_color_reference)
+			local real_distance = ui_get(real_length_reference)
+
+			local headX, headY, headZ = entity_hitbox_position(local_player, 0)
+			local deltaX, deltaY = headX-locationX, headY-locationY
+			local realYaw = math_deg(math_atan2(deltaY, deltaX))
+
+			locationXFake = locationX + math_cos(math_rad(realYaw)) * real_distance
+			locationYFake = locationY + math_sin(math_rad(realYaw)) * real_distance
+
+			local worldXFake, worldYFake = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
+			local worldXFakeText, worldYFakeText = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
+
+			if worldXFake ~= nil then
+				client_draw_line(ctx, worldX, worldY, worldXFake, worldYFake, real_r, real_g, real_b, real_a)
+				client_draw_text(ctx, worldXFakeText, worldYFakeText, real_r, real_g, real_b, real_a, "c-", 0, "REAL")
+			end
+		end
 
 		if contains(value, "Fake") then
 			local fake_r, fake_g, fake_b, fake_a = ui_get(fake_color_reference)
