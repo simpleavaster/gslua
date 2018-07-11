@@ -26,6 +26,13 @@ local camera_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "Came
 local boxSize = 30
 local length = 40
 
+local debug = false
+local function debug_log(message)
+	if debug then
+		client.log(message)
+	end
+end
+
 local function contains(table, val)
 	for i=1,#table do
 		if table[i] == val then 
@@ -73,9 +80,13 @@ local function on_paint(ctx)
 
 	if locationX then
 
+		debug_log("ingame + drawing")
+
 		local worldX, worldY = client_world_to_screen(ctx, locationX, locationY, locationZ)
 
 		if worldX == nil or worldY == nil then return end
+
+		local lbyYaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
 
 		if contains(value, "Real") then
 			local real_r, real_g, real_b, real_a = ui_get(real_color_reference)
@@ -84,16 +95,20 @@ local function on_paint(ctx)
 			local headX, headY, headZ = entity_hitbox_position(local_player, 0)
 			local deltaX, deltaY = headX-locationX, headY-locationY
 			local realYaw = math_deg(math_atan2(deltaY, deltaX))
+			local additional = lbyYaw > realYaw and -10 or 20
+			if math_abs(lbyYaw-realYaw) > 15 then
+				realYaw = realYaw + additional
+			end
 
-			locationXFake = locationX + math_cos(math_rad(realYaw)) * real_distance
-			locationYFake = locationY + math_sin(math_rad(realYaw)) * real_distance
+			locationXReal = locationX + math_cos(math_rad(realYaw)) * real_distance
+			locationYReal = locationY + math_sin(math_rad(realYaw)) * real_distance
 
-			local worldXFake, worldYFake = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
-			local worldXFakeText, worldYFakeText = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
+			local worldXReal, worldYReal = client_world_to_screen(ctx, locationXReal, locationYReal, locationZ)
 
-			if worldXFake ~= nil then
-				client_draw_line(ctx, worldX, worldY, worldXFake, worldYFake, real_r, real_g, real_b, real_a)
-				client_draw_text(ctx, worldXFakeText, worldYFakeText, real_r, real_g, real_b, real_a, "c-", 0, "REAL")
+			if worldXReal ~= nil then
+				debug_log("drawing real with colors " .. real_r .. ", " .. real_g .. ", " .. real_b .. ", " .. real_a)
+				client_draw_line(ctx, worldX, worldY, worldXReal, worldYReal, real_r, real_g, real_b, real_a)
+				client_draw_text(ctx, worldXReal, worldYReal, real_r, real_g, real_b, real_a, "c-", 0, "REAL")
 			end
 		end
 
@@ -105,27 +120,24 @@ local function on_paint(ctx)
 			locationYFake = locationY + math_sin(math_rad(fakeYaw)) * fake_distance
 
 			local worldXFake, worldYFake = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
-			local worldXFakeText, worldYFakeText = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
 
 			if worldXFake ~= nil then
 				client_draw_line(ctx, worldX, worldY, worldXFake, worldYFake, fake_r, fake_g, fake_b, fake_a)
-				client_draw_text(ctx, worldXFakeText, worldYFakeText, fake_r, fake_g, fake_b, fake_a, "c-", 0, "FAKE")
+				client_draw_text(ctx, worldXFake, worldYFake, fake_r, fake_g, fake_b, fake_a, "c-", 0, "FAKE")
 			end
 		end
 
 		if contains(value, "LBY") then
 			local lby_r, lby_g, lby_b, lby_a = ui_get(lby_color_reference)
 			local lby_distance = ui_get(lby_length_reference)
-			local lbyYaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
 			locationXLBY = locationX + math_cos(math_rad(lbyYaw)) * lby_distance
 			locationYLBY = locationY + math_sin(math_rad(lbyYaw)) * lby_distance
 
 			local worldXLBY, worldYLBY = client_world_to_screen(ctx, locationXLBY, locationYLBY, locationZ)
-			local worldXLBYText, worldYLBYText = client_world_to_screen(ctx, locationXLBY, locationYLBY, locationZ)
 
 			if worldXLBY ~= nil then
 				client_draw_line(ctx, worldX, worldY, worldXLBY, worldYLBY, lby_r, lby_g, lby_b, lby_a)
-				client_draw_text(ctx, worldXLBYText, worldYLBYText, lby_r, lby_g, lby_b, lby_a, "c-", 0, "LBY")
+				client_draw_text(ctx, worldXLBY, worldYLBY, lby_r, lby_g, lby_b, lby_a, "c-", 0, "LBY")
 			end
 		end
 
@@ -137,11 +149,10 @@ local function on_paint(ctx)
 			locationYCamera = locationY + math_sin(math_rad(cameraYaw)) * camera_distance
 
 			local worldXCamera, worldYCamera = client_world_to_screen(ctx, locationXCamera, locationYCamera, locationZ)
-			local worldXCameraText, worldYCameraText = client_world_to_screen(ctx, locationXCamera, locationYCamera, locationZ)
 
 			if worldXCamera ~= nil then
 				client_draw_line(ctx, worldX, worldY, worldXCamera, worldYCamera, camera_r, camera_g, camera_b, camera_a)
-				client_draw_text(ctx, worldXCameraText, worldYCameraText, camera_r, camera_g, camera_b, camera_a, "c-", 0, "CAM")
+				client_draw_text(ctx, worldXCamera, worldYCamera, camera_r, camera_g, camera_b, camera_a, "c-", 0, "CAM")
 			end
 		end
 
