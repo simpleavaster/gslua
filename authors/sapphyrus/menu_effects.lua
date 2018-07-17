@@ -12,7 +12,7 @@ local string_find, string_format, string_rep, string_gsub, string_len, string_gm
 --end of local variables 
 
 local function distance(x1, y1, x2, y2)
-	return sqrt((x2-x1)^2 + (y2-y1)^2)
+	return math_sqrt((x2-x1)^2 + (y2-y1)^2)
 end
 
 local function hsv_to_rgb(h, s, v, a)
