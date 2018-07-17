@@ -100,7 +100,7 @@ local lines_progress = 0
 local dots = {}
 local dot_size = 3
 
-client_delay_call(2, 
+client_delay_call(0.2, 
 	function()
 		if not ingame then
 			menu_open = false
