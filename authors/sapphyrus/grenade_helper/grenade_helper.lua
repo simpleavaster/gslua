@@ -79,6 +79,8 @@ local autorelease_reference = ui.new_hotkey("VISUALS", "Other ESP", "Grenade ass
 local saving_enabled_reference = ui.new_checkbox("VISUALS", "Other ESP", "Grenade helper saving (" .. command_name .. ")")
 local airstrafe_reference = ui.reference("MISC", "Miscellaneous", "Air strafe")
 
+local shorten_name = true
+
 local box_size = 32
 local max_distance = 600
 local max_distance_meta = 450
@@ -205,7 +207,7 @@ local function on_paint(ctx)
 		local command = client_get_cvar(command_name)
 		if not (command == "0" or command == "1") then
 			local words = {}
-			for word in string.gmatch(command, "%w+") do table.insert(words, word) end
+			for word in string.gmatch(command, "%S+") do table.insert(words, word) end
 
 			client.exec(command_name .. " 0")
 			if command == "" or command == " " or command == '""' or command == nil or #words < 2 then
@@ -299,6 +301,26 @@ local function on_paint(ctx)
 		local grenade_meta = grenades_map[i]
 
 		local name, grenade, throw_type, x, y, z, pitch, yaw = grenade_meta["name"], grenade_meta["grenade"], grenade_meta["throwType"], grenade_meta["x"], grenade_meta["y"], grenade_meta["z"], grenade_meta["pitch"], grenade_meta["yaw"]
+
+		if shorten_name then
+			local words = {}
+			for word in string_gmatch(name, "%S+") do table.insert(words, word) end
+			local name_array = {}
+
+			local to_hit = false
+			for i=1, #words do
+				if to_hit then
+					table_insert(name_array, words[i])
+				end
+				if string_lower(words[i]) == "to" then
+					to_hit = true
+				end
+			end
+
+			if #name_array > 0 then
+				name = table_concat(name_array, " ")
+			end
+		end
 
 		local r, g, b, a = ui_get(color_reference)
 		local r_secondary, g_secondary, b_secondary, a_secondary = ui_get(secondary_color_reference)
@@ -407,7 +429,7 @@ local function on_paint(ctx)
 					local viewangles_distance
 
 					local throw_strength = grenade_meta["throwStrength"] or 1
-					local viewangles_distance_max = grenade_meta["viewAnglesDistanceMax"] or 0.18
+					local viewangles_distance_max = grenade_meta["viewAnglesDistanceMax"] or 0.22
 					local extra_info_text = ""
 					local extra_info = {}
 
@@ -483,7 +505,7 @@ local function on_paint(ctx)
 										end
 									end
 								else
-									if 255-aHudGreen < 10 and 255-aHudGreen > 2 then
+									if 255-aHudGreen < 10 and autorelease_possible then
 										client_exec("-forward; -back; -moveleft; -moveright;")
 									end
 								end
