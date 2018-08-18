@@ -117,8 +117,6 @@ local console_names = {
 	CWeaponTec9="weapon_wallbang_normal",
 }
 
-local test_distance_reference = ui.new_slider("MISC", "LUA", "Grenade helper distance test", 1, 10000, 800)
-
 local function class_to_console_name(class)
 	return console_names[class]
 end
@@ -167,6 +165,10 @@ ui.set_callback(enabled_reference, on_enabled_changed)
 
 local function ticks_to_seconds(ticks)
 	return ticks*1/64
+end
+
+local function get_tickrate()
+	return 1/globals_tickinterval()
 end
 
 local function freeze_sensitivity(reset_delay)
@@ -245,6 +247,7 @@ local function on_paint(ctx)
 				'	"name": "', name, '",', "\n",
 				'	"description": "Manually added.",', "\n",
 				'	"grenade": "', weapon_name, '",', "\n",
+				'	"tickrate": "', get_tickrate(), '",', "\n",
 				'	"throwType": "', string_upper(words[1]), '",', "\n",
 				duck_string,
 				'	"x": "', x, '",', "\n",
@@ -277,6 +280,7 @@ local function on_paint(ctx)
 	local localpitch, localyaw = client_camera_angles()
 	local screen_width, screen_height = client_screen_size()
 	local voZ = entity_get_prop(entity_get_local_player(), "m_vecViewOffset[2]")
+	local tickrate = get_tickrate()
 
 	local text_offsets = {}
 
@@ -330,12 +334,17 @@ local function on_paint(ctx)
 			voZTemp = 46
 		end
 
+		local tickrate_matches = true
+		if grenade_meta["tickrate"] ~= nil then
+			tickrate_matches = tonumber(grenade_meta["tickrate"]) == tickrate
+		end
+
 		local a_bottom = a
 		local zText = z - voZTemp/2
 
 		grenade = grenade == "weapon_incendiary" and "weapon_molotov" or grenade --fix invalid weapon name
 
-		if grenade == weapon_name or grenade == "weapon_wallbang_normal" and weapon_name == "weapon_wallbang" then
+		if grenade == weapon_name or grenade == "weapon_wallbang_normal" and weapon_name == "weapon_wallbang" and tickrate_matches then
 
 			local distance_pos = distance(localX, localY, x, y)
 			if throw_type == "WALLBANG" then
@@ -515,6 +524,7 @@ local function on_paint(ctx)
 
 					text_offsets[round(x) .. " " .. round(y) .. " " .. round(z)] = text_offset + text_offset_add
 					local is_overlaying = (is_in_position and not current_in_position)
+					--client.log(is_overlaying)
 					if not is_overlaying then
 						if can_see then
 
@@ -541,7 +551,8 @@ local function on_paint(ctx)
 											" pitch=", round(grenade_meta["pitch"], 2), 
 											", Current yaw=", round(localyaw, 2), 
 											" pitch=", round(localpitch, 2),
-											" -> distance=", viewangles_distance, " (", viewangles_distance < viewangles_distance_max, ")"
+											" -> distance=", viewangles_distance, " (", viewangles_distance < viewangles_distance_max, ")",
+											" is_in_position=", is_in_position, " current_in_position=", current_in_position
 										)
 									end
 								end
