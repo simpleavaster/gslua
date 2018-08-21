@@ -26,9 +26,6 @@ local lby_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "LBY Col
 local camera_length_reference = ui.new_slider("VISUALS", "Other ESP", "Camera Distance / Color", 10, 80, 30, true, "u")
 local camera_color_reference = ui.new_color_picker("VISUALS", "Other ESP", "Camera Color", 255, 255, 255, 220)
 
-local boxSize = 30
-local length = 40
-
 local function is_thirdperson(ctx)
 	local x, y, z = client_eye_position()
 	local pitch, yaw = client_camera_angles()
@@ -45,7 +42,7 @@ local function is_thirdperson(ctx)
 end
 
 local function contains(table, val)
-	for i=1,#table do
+	for i=1, #table do
 		if table[i] == val then 
 			return true
 		end
@@ -68,107 +65,79 @@ local function on_show_angles_change()
 	ui_set_visible(camera_color_reference, contains(value, "Camera"))
 end
 
-ui_set_callback(show_angles_reference, on_show_angles_change)
+local function draw_angle(ctx, name, r, g, b, a, distance, location_x, location_y, location_z, origin_x, origin_y, yaw)
+	local location_x_angle = location_x + math_cos(math_rad(yaw)) * distance
+	local location_y_angle = location_y + math_sin(math_rad(yaw)) * distance
+
+	local world_x, world_y = client_world_to_screen(ctx, location_x_angle, location_y_angle, location_z)
+
+	if world_x ~= nil then
+		client_draw_line(ctx, origin_x, origin_y, world_x, world_y, r, g, b, a)
+		client_draw_text(ctx, world_x, world_y, r, g, b, a, "c-", 0, name)
+	end
+end
+ui.set_callback(show_angles_reference, on_show_angles_change)
 
 local function on_paint(ctx)
-	local local_player = entity_get_local_player()
-
-	if local_player == nil then
-		return
-	end
-
-	if entity_get_prop(local_player, "m_lifeState") ~= 0 then
-		return
-	end
-
 	local value = ui_get(show_angles_reference)
-
-	if #value == 0 then
+	if #value == 0 or not is_thirdperson(ctx) then
 		return
 	end
 
-	if not is_thirdperson(ctx) then
+	local local_player = entity_get_local_player()
+	if local_player == nil or entity_get_prop(local_player, "m_lifeState") ~= 0 then
 		return
 	end
 
-	local locationX, locationY, locationZ = client_eye_position()
-	locationZ = locationZ - entity_get_prop(local_player, "m_vecViewOffset[2]") - 1
+	local location_x, location_y, location_z = entity_get_prop(local_player, "m_vecAbsOrigin")
+	location_z = location_z + 1
 
-	if locationX then
+	if location_x then
+		local world_x, world_y = client_world_to_screen(ctx, location_x, location_y, location_z)
 
-		local worldX, worldY = client_world_to_screen(ctx, locationX, locationY, locationZ)
-
-		if worldX == nil or worldY == nil then return end
-
-		local lbyYaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
+		if world_x == nil then
+			return
+		end
 
 		if contains(value, "Real") then
-			local real_r, real_g, real_b, real_a = ui_get(real_color_reference)
-			local real_distance = ui_get(real_length_reference)
+			local r, g, b, a = ui_get(real_color_reference)
+			local distance = ui_get(real_length_reference)
 
-			local headX, headY, headZ = entity_hitbox_position(local_player, 0)
-			local deltaX, deltaY = headX-locationX, headY-locationY
-			local realYaw = math_deg(math_atan2(deltaY, deltaX))
-
-			locationXReal = locationX + math_cos(math_rad(realYaw)) * real_distance
-			locationYReal = locationY + math_sin(math_rad(realYaw)) * real_distance
-
-			local worldXReal, worldYReal = client_world_to_screen(ctx, locationXReal, locationYReal, locationZ)
-
-			if worldXReal ~= nil then
-				client_draw_line(ctx, worldX, worldY, worldXReal, worldYReal, real_r, real_g, real_b, real_a)
-				client_draw_text(ctx, worldXReal, worldYReal, real_r, real_g, real_b, real_a, "c-", 0, "REAL")
+			local _, yaw = entity_get_prop(local_player, "m_angAbsRotation")
+			if yaw ~= nil then
+				local bodyyaw = entity_get_prop(local_player, "m_flPoseParameter", 11)
+				if bodyyaw ~= nil then
+					bodyyaw = bodyyaw * 120 - 60
+					draw_angle(ctx, "REAL", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw + bodyyaw)
+				end
 			end
 		end
 
 		if contains(value, "Fake") then
-			local fake_r, fake_g, fake_b, fake_a = ui_get(fake_color_reference)
-			local fake_distance = ui_get(fake_length_reference)
-			local _, fakeYaw, _ = entity_get_prop(entity_get_local_player(), "m_angEyeAngles")
-			locationXFake = locationX + math_cos(math_rad(fakeYaw)) * fake_distance
-			locationYFake = locationY + math_sin(math_rad(fakeYaw)) * fake_distance
+			local r, g, b, a = ui_get(fake_color_reference)
+			local distance = ui_get(fake_length_reference)
+			local _, yaw, _ = entity_get_prop(entity_get_local_player(), "m_angEyeAngles")
 
-			local worldXFake, worldYFake = client_world_to_screen(ctx, locationXFake, locationYFake, locationZ)
-
-			if worldXFake ~= nil then
-				client_draw_line(ctx, worldX, worldY, worldXFake, worldYFake, fake_r, fake_g, fake_b, fake_a)
-				client_draw_text(ctx, worldXFake, worldYFake, fake_r, fake_g, fake_b, fake_a, "c-", 0, "FAKE")
-			end
+			draw_angle(ctx, "FAKE", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
 		end
 
 		if contains(value, "LBY") then
-			local lby_r, lby_g, lby_b, lby_a = ui_get(lby_color_reference)
-			local lby_distance = ui_get(lby_length_reference)
-			locationXLBY = locationX + math_cos(math_rad(lbyYaw)) * lby_distance
-			locationYLBY = locationY + math_sin(math_rad(lbyYaw)) * lby_distance
+			local r, g, b, a = ui_get(lby_color_reference)
+			local distance = ui_get(lby_length_reference)
+			local yaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
 
-			local worldXLBY, worldYLBY = client_world_to_screen(ctx, locationXLBY, locationYLBY, locationZ)
-
-			if worldXLBY ~= nil then
-				client_draw_line(ctx, worldX, worldY, worldXLBY, worldYLBY, lby_r, lby_g, lby_b, lby_a)
-				client_draw_text(ctx, worldXLBY, worldYLBY, lby_r, lby_g, lby_b, lby_a, "c-", 0, "LBY")
-			end
+			draw_angle(ctx, "LBY", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
 		end
 
 		if contains(value, "Camera") then
-			local camera_r, camera_g, camera_b, camera_a = ui_get(camera_color_reference)
-			local camera_distance = ui_get(camera_length_reference)
-			local _, cameraYaw = client_camera_angles()
-			locationXCamera = locationX + math_cos(math_rad(cameraYaw)) * camera_distance
-			locationYCamera = locationY + math_sin(math_rad(cameraYaw)) * camera_distance
+			local r, g, b, a = ui_get(camera_color_reference)
+			local distance = ui_get(camera_length_reference)
+			local _, yaw = client_camera_angles()
 
-			local worldXCamera, worldYCamera = client_world_to_screen(ctx, locationXCamera, locationYCamera, locationZ)
-
-			if worldXCamera ~= nil then
-				client_draw_line(ctx, worldX, worldY, worldXCamera, worldYCamera, camera_r, camera_g, camera_b, camera_a)
-				client_draw_text(ctx, worldXCamera, worldYCamera, camera_r, camera_g, camera_b, camera_a, "c-", 0, "CAM")
-			end
+			draw_angle(ctx, "CAM", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
 		end
 
-		if #value > 0 then
-			client_draw_circle(ctx, worldX, worldY, 17, 17, 17, 255, 2, 0, 1)
-		end
+		client_draw_circle(ctx, world_x, world_y, 17, 17, 17, 255, 2, 0, 1)
 	end
 end
-
 client.set_event_callback("paint", on_paint)
