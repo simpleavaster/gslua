@@ -65,7 +65,7 @@ local function on_show_angles_change()
 	ui_set_visible(camera_color_reference, contains(value, "Camera"))
 end
 
-local function draw_angle(ctx, name, r, g, b, a, distance, location_x, location_y, location_z, origin_x, origin_y, yaw)
+local function draw_angle(ctx, name, distance, location_x, location_y, location_z, origin_x, origin_y, yaw, r, g, b, a)
 	local location_x_angle = location_x + math_cos(math_rad(yaw)) * distance
 	local location_y_angle = location_y + math_sin(math_rad(yaw)) * distance
 
@@ -100,41 +100,32 @@ local function on_paint(ctx)
 		end
 
 		if contains(value, "Real") then
-			local r, g, b, a = ui_get(real_color_reference)
-			local distance = ui_get(real_length_reference)
-
 			local _, yaw = entity_get_prop(local_player, "m_angAbsRotation")
 			if yaw ~= nil then
 				local bodyyaw = entity_get_prop(local_player, "m_flPoseParameter", 11)
 				if bodyyaw ~= nil then
 					bodyyaw = bodyyaw * 120 - 60
-					draw_angle(ctx, "REAL", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw + bodyyaw)
+					draw_angle(ctx, "REAL", ui_get(real_length_reference), location_x, location_y, location_z, world_x, world_y, yaw + bodyyaw, ui_get(real_color_reference))
 				end
 			end
 		end
 
 		if contains(value, "Fake") then
-			local r, g, b, a = ui_get(fake_color_reference)
-			local distance = ui_get(fake_length_reference)
 			local _, yaw, _ = entity_get_prop(entity_get_local_player(), "m_angEyeAngles")
 
-			draw_angle(ctx, "FAKE", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
+			draw_angle(ctx, "FAKE", ui_get(fake_length_reference), location_x, location_y, location_z, world_x, world_y, yaw, ui_get(fake_color_reference))
 		end
 
 		if contains(value, "LBY") then
-			local r, g, b, a = ui_get(lby_color_reference)
-			local distance = ui_get(lby_length_reference)
 			local yaw = entity_get_prop(entity_get_local_player(), "m_flLowerBodyYawTarget")
 
-			draw_angle(ctx, "LBY", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
+			draw_angle(ctx, "LBY", ui_get(lby_length_reference), location_x, location_y, location_z, world_x, world_y, yaw, ui_get(lby_color_reference))
 		end
 
 		if contains(value, "Camera") then
-			local r, g, b, a = ui_get(camera_color_reference)
-			local distance = ui_get(camera_length_reference)
 			local _, yaw = client_camera_angles()
 
-			draw_angle(ctx, "CAM", r, g, b, a, distance, location_x, location_y, location_z, world_x, world_y, yaw)
+			draw_angle(ctx, "CAM", ui_get(camera_length_reference), location_x, location_y, location_z, world_x, world_y, yaw, ui_get(camera_color_reference))
 		end
 
 		client_draw_circle(ctx, world_x, world_y, 17, 17, 17, 255, 2, 0, 1)
