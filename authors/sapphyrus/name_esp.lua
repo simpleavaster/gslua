@@ -50,8 +50,9 @@ end
 
 local function on_enabled_change()
 	--hide default elements
-	ui_set_visible(default_name_reference, true)
-	ui_set_visible(default_name_color_reference, true)
+	ui_set_visible(default_name_reference, false)
+	ui_set_visible(default_name_color_reference, false)
+	
 	local enabled = ui_get(enabled_reference)
 	ui_set(default_name_reference, enabled == "Normal")
 end
