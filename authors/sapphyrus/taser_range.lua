@@ -11,6 +11,25 @@ local table_maxn, table_foreach, table_sort, table_remove, table_foreachi, table
 local string_find, string_format, string_rep, string_gsub, string_len, string_gmatch, string_dump, string_match, string_reverse, string_byte, string_char, string_upper, string_lower, string_sub = string.find, string.format, string.rep, string.gsub, string.len, string.gmatch, string.dump, string.match, string.reverse, string.byte, string.char, string.upper, string.lower, string.sub 
 --end of local variables 
 
+local function distance3d(x1, y1, z1, x2, y2, z2)
+	return math_sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1))
+end
+
+local function is_thirdperson(ctx)
+	local x, y, z = client_eye_position()
+	local pitch, yaw = client_camera_angles()
+	
+	yaw = yaw - 180
+	pitch, yaw = math_rad(pitch), math_rad(yaw)
+
+	x = x + math_cos(yaw)*4
+	y = y + math_sin(yaw)*4
+	z = z + math_sin(pitch)*4
+
+	local wx, wy = client_world_to_screen(ctx, x, y, z)
+	return wx ~= nil
+end
+
 local function draw_circle_3d(ctx, x, y, z, radius, r, g, b, a, accuracy)
 	local accuracy = accuracy or 3
 	local screen_x_line_old, screen_y_line_old
@@ -23,6 +42,36 @@ local function draw_circle_3d(ctx, x, y, z, radius, r, g, b, a, accuracy)
 		end
 		screen_x_line_old, screen_y_line_old = screen_x_line, screen_y_line
 	end
+end
+
+local function is_teammate(player)
+	return entity_get_prop(player, "m_iTeamNum") == entity_get_prop(entity_get_local_player(), "m_iTeamNum")
+end
+
+local function lerp_pos(x1, y1, z1, x2, y2, z2, percentage)
+	local x = (x2 - x1) * percentage + x1
+	local y = (y2 - y1) * percentage + y1
+	local z = (z2 - z1) * percentage + z1
+	return x, y, z
+end
+
+local function trace_line_skip_teammates(skip_entindex, x1, y1, z1, x2, y2, z2, max_traces)
+	local max_traces = max_traces or 10
+	local fraction, entindex_hit = 0, -1
+	local x_hit, y_hit, z_hit = x1, y1, z1
+
+	local i=1
+	while (entindex_hit == -1 or (entindex_hit ~= 0 and is_teammate(entindex_hit))) and 1 > fraction and max_traces >= i do
+		fraction, entindex_hit = client_trace_line(entindex_hit, x_hit, y_hit, z_hit, x2, y2, z2)
+		x_hit, y_hit, z_hit = lerp_pos(x_hit, y_hit, z_hit, x2, y2, z2, fraction)
+
+		i = i + 1
+	end
+
+	local traveled_total = distance3d(x1, y1, z1, x_hit, y_hit, z_hit)
+	local total_distance = distance3d(x1, y1, z1, x2, y2, z2)
+
+	return traveled_total/total_distance, entindex_hit
 end
 
 local function hsv_to_rgb(h, s, v, a)
@@ -79,6 +128,7 @@ local function on_paint(ctx)
 	if weapon_name == "CWeaponTaser" or had_taser then
 		ranges = {183-16}
 		ranges_opacities = {1}
+	--uncomment to enable knife range
 	--elseif weapon_name == "CKnife" then
 	--	ranges = {32, 48}
 	--	ranges_opacities = {1, 0.2}
@@ -88,8 +138,12 @@ local function on_paint(ctx)
 		return
 	end
 
-	local local_x, local_y, local_z = entity_get_prop(local_player, "m_vecOrigin")
+	local local_x, local_y, local_z = entity_get_prop(local_player, "m_vecAbsOrigin")
 	local vo_z = entity_get_prop(local_player, "m_vecViewOffset[2]")-4
+
+	if not is_thirdperson(ctx) then
+		vo_z = vo_z-12
+	end
 
 	local fade_multiplier
 	if curtime - last_switch < 0.3 then
@@ -102,6 +156,11 @@ local function on_paint(ctx)
 		fade_multiplier = 1 - fade_multiplier
 	end
 
+	weapon_name_prev = weapon_name
+	if fade_multiplier == 0 then
+		return
+	end
+
 	for i=1, #ranges do
 		local range = ranges[i]
 		local opacity_multiplier = ranges_opacities[i] * fade_multiplier
@@ -111,9 +170,10 @@ local function on_paint(ctx)
 		for rot=0, 360, accuracy do
 			local rot_temp = math_rad(rot)
 			local temp_x, temp_y, temp_z = local_x + range * math_cos(rot_temp), local_y + range * math_sin(rot_temp), local_z
-			local fraction = client_trace_line(local_player, local_x, local_y, local_z+vo_z, temp_x, temp_y, local_z+vo_z)
+			local fraction, entindex_hit = trace_line_skip_teammates(local_player, local_x, local_y, local_z+vo_z, temp_x, temp_y, local_z+vo_z)
 
-			local fraction_x, fraction_y = local_x+(temp_x-local_x)*fraction, local_y+(temp_y-local_y)*fraction
+			--local fraction_x, fraction_y = local_x+(temp_x-local_x)*fraction, local_y+(temp_y-local_y)*fraction
+			local fraction_x, fraction_y = lerp_pos(local_x, local_y, local_z, temp_x, temp_y, temp_z, fraction)
 			local world_x, world_y = client_world_to_screen(ctx, fraction_x, fraction_y, temp_z+vo_z)
 
 			local hue_extra = globals_realtime() % 8 / 8
@@ -130,8 +190,6 @@ local function on_paint(ctx)
 			previous_world_x, previous_world_y = world_x, world_y
 		end
 	end
-
-	weapon_name_prev = weapon_name
 end
 
 client.set_event_callback("paint", on_paint)
