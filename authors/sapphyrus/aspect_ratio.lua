@@ -19,7 +19,7 @@ local function set_aspect_ratio(aspect_ratio_multiplier)
 	if aspect_ratio_multiplier == 1 then
 		aspectratio_value = 0
 	end
-	client_set_cvar("r_aspectratio", tostring(aspectratio_value))
+	client_set_cvar("r_aspectratio", tonumber(aspectratio_value))
 end
 
 local function gcd(m, n)
