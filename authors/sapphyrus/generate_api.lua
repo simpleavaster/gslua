@@ -1,8 +1,9 @@
-local to_dump = {{name="client", table=client}, {name="entity", table=entity}, {name="globals", table=globals}, {name="ui", table=ui}, {name="math", table=math}, {name="table", table=table}}
+local to_dump = {{name="client", table=client}, {name="entity", table=entity}, {name="globals", table=globals}, {name="ui", table=ui}, {name="math", table=math}, {name="table", table=table}, {name="string", table=string}}
 local table_insert = table.insert
 local table_remove = table.remove
 local table_concat = table.concat
 local string_len = string.len
+local math_ceil = math.ceil
 
 local function get_n_elements(table, n, start)
 	local new_table = {}
@@ -40,21 +41,31 @@ local function dump_api()
 		local name = to_dump[i]["name"]
 		local part1 = {}
 		local part2 = {}
+		local amt = 0
 		for i,v in pairs(global) do
 			table_insert(part1, name .. "_" .. i)
 			table_insert(part2, name .. "." .. i)
+			amt = amt + 1
 		end
 		local message = "local " .. table_concat(part1, ", ") .. " = " .. table_concat(part2, ", ")
-		local split_at = #part1/2
-		if string_len(message) > 512 then
-			local part1_1, part2_1 = get_n_elements(part1, split_at), get_n_elements(part2, split_at)
-			local part1_2, part2_2 = get_n_elements(part1, #part1, #part1_1), get_n_elements(part2, #part2, #part2_1)
-			message1 = "local " .. table_concat(part1_1, ", ") .. " = " .. table_concat(part2_1, ", ")
-			message2 = "local " .. table_concat(part1_2, ", ") .. " = " .. table_concat(part2_2, ", ")
-			log_raw(message1)
-			log_raw(message2)
-		else
-			log_raw(message)
+		local messages = {}
+
+		local parts = 1
+		if string_len(message) > 450 then
+			parts = math_ceil(string_len(message) / 450)
+		end
+
+		local split_at = math.floor(#part1/parts)
+		local start = 0
+
+		for i=1, parts do
+			local split_at_temp = split_at * i + 2
+			local part1_1, part2_1 = get_n_elements(part1, split_at_temp, start+1), get_n_elements(part2, split_at_temp, start+1)
+			table_insert(messages, "local " .. table_concat(part1_1, ", ") .. " = " .. table_concat(part2_1, ", "))
+			start = split_at_temp
+		end
+		for i=1, #messages do
+			log_raw(messages[i])
 		end
 	end
 	log_raw("--end of local variables")
