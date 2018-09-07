@@ -23,7 +23,6 @@ local smoke_radius_units = 125
 local smoke_duration = 17.55
 local molotov_duration = 7
 
-local dormant_grenades = {}
 local molotovs_created_at = {}
 
 local function distance(x1, y1, x2, y2)
