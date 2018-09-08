@@ -209,7 +209,7 @@ local function on_paint(ctx)
 						if molotov_team then
 							local thrower = entity_get_prop(grenade, "m_hOwnerEntity")
 							local is_safe = false
-							if tonumber(client_get_cvar("mp_friendlyfire")) == 0 and thrower ~= entity_get_local_player() and not entity_is_enemy(thrower) then
+							if thrower ~= nil and tonumber(client_get_cvar("mp_friendlyfire")) == 0 and thrower ~= entity_get_local_player() and not entity_is_enemy(thrower) then
 								is_safe = true
 							end
 							if is_safe then
